@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+cp .bashrc    "$HOME"
+cp .gitconfig "$HOME"
+cp .inputrc   "$HOME"
