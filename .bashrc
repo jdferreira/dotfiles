@@ -103,7 +103,7 @@ if [ -d "$HOME/.pyenv/bin" ]; then
     export PATH="$HOME/.pyenv/bin:$PATH"
     eval "$(pyenv init -)"
     eval "$(pyenv virtualenv-init -)"
-    pyenv shell 3.7.2
+    pyenv shell $(pyenv versions | tail -n1) 2>/dev/null
 fi
 
 
