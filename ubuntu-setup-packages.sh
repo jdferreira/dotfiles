@@ -20,3 +20,15 @@ fi
 if wants 'Docker'; then
     sudo apt install docker-ce
 fi
+
+if wants 'pyenv'; then
+    curl https://pyenv.run | bash
+    
+    eval "$(pyenv init -)"
+    eval "$(pyenv virtualenv-init -)"
+    pyenv shell $(pyenv versions | tail -n1) 2> /dev/null
+fi
+
+if wants 'git-remote-dropbox'; then
+    pip install git-remote-dropbox
+fi
