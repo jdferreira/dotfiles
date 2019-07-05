@@ -13,7 +13,32 @@ esac
 # PS1 customization #
 #####################
 
-PS1='[\[\e[31m\]\h\[\e[00m\]] \[\e[32m\]\t\[\e[00m\] \[\e[34m\]\w\[\e[00m\]\$ '
+get_short_wd() {
+    local depth=3
+    local ellipsis="…"
+    local cwd="${PWD/#$HOME/\~}"
+
+    if [ $(echo -n $cwd | awk -F '/' '{ print NF }') -gt $depth ]; then
+        tail=$(seq $(($depth-2)) '-1' 0 | sed 's/.*/$(NF-\0)/' | paste -sd '/' - | sed 's_/_ "/" _g')
+        
+        cwd=$(echo -n $cwd | awk -F '/' '{ print $1 "/" "'"$ellipsis"'" "/" '"$tail"' }')
+    fi 
+
+    echo $cwd
+}
+
+parse_git_branch() {
+    local yellow="$(tput setaf 3)$(tput bold)"
+    local reset="$(tput sgr0)"
+
+    git symbolic-ref HEAD --short 2> /dev/null | sed -e 's/.*/('"$yellow"'\0'"$reset"')/'
+}
+
+PS1='\[\e[32m\]\t\[\e[00m\] \
+[\[\e[31m\]\h\[\e[00m\]] \
+\[\e[34m\]$(get_short_wd)\[\e[00m\] \
+$(parse_git_branch)\n\
+\$ '
 
 
 #########################
