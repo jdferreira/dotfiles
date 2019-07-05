@@ -3,5 +3,6 @@
 cp .bashrc    "$HOME"
 cp .gitconfig "$HOME"
 cp .inputrc   "$HOME"
+cp .vimrc     "$HOME"
 
 . ubuntu-setup-packages.sh
