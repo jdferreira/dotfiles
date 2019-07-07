@@ -7,7 +7,7 @@ wants() {
 }
 
 sudo apt update
-sudo apt install git vim curl
+sudo apt install git vim curl htop
 
 if wants 'VS Code'; then
     echo 'Go to https://code.visualstudio.com/Download and download the'
