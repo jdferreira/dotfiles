@@ -6,4 +6,5 @@ cp -l .gitconfig "$HOME"
 cp -l .inputrc   "$HOME"
 cp -l .vimrc     "$HOME"
 
-. ubuntu-setup-packages.sh
+# Install the apt packages
+. setup-apt-packages.sh
