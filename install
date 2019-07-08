@@ -8,3 +8,6 @@ cp -l .vimrc     "$HOME"
 
 # Install the apt packages
 . install-apt-packages.sh
+
+# Setup preferences
+. setup-preferences.sh
