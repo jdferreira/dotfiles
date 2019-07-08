@@ -7,5 +7,5 @@ wants() {
 }
 
 if wants 'gnome-terminal'; then
-    dconf load /org/gnome/terminal/ < preferences/gnome-terminal.ini
+    dconf load /org/gnome/terminal/ < preferences/gnome-terminal/config
 fi
