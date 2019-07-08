@@ -7,4 +7,4 @@ cp -l .inputrc   "$HOME"
 cp -l .vimrc     "$HOME"
 
 # Install the apt packages
-. setup-apt-packages.sh
+. install-apt-packages.sh
