@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
-cp .bashrc    "$HOME"
-cp .gitconfig "$HOME"
-cp .inputrc   "$HOME"
-cp .vimrc     "$HOME"
+# Copy (as hard links) the dot files to the home directory
+cp -l .bashrc    "$HOME"
+cp -l .gitconfig "$HOME"
+cp -l .inputrc   "$HOME"
+cp -l .vimrc     "$HOME"
 
 . ubuntu-setup-packages.sh
