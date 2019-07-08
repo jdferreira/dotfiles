@@ -3,3 +3,5 @@
 	name = João D. Ferreira
 [core]
 	editor = vim
+[commit]
+	verbose = true
