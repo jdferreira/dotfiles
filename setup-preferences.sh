@@ -9,3 +9,11 @@ wants() {
 if wants 'gnome-terminal'; then
     dconf load /org/gnome/terminal/ < preferences/gnome-terminal/config
 fi
+
+if wants 'VS Code'; then
+    mkdir -p "$HOME/.vscode"
+    mkdir -p "$HOME/.config/Code/User"
+
+    cp -rl preferences/vscode/.vscode/* "$HOME/.vscode"
+    cp -rl preferences/vscode/user-config/* "$HOME/.config/Code/User"
+fi
