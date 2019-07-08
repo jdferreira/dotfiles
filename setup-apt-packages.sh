@@ -42,3 +42,7 @@ fi
 if wants 'git-remote-dropbox'; then
     pip install git-remote-dropbox
 fi
+
+if wants 'pygments'; then
+    pip install pygments
+fi

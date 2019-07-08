@@ -111,6 +111,12 @@ alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo
 # Echo the apt logs
 alias apt-log='zcat -qf /var/log/apt/history.log*'
 
+# Use pygmentize to color code on the terminal
+alias pyg='pygmentize -O style=native'
+
+# Format JSON output
+alias ppjson='python -m json.tool --sort-keys | pyg -l json'
+
 
 ########
 # Less #
