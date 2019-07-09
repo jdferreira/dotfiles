@@ -7,7 +7,15 @@ wants() {
 }
 
 sudo apt update
-sudo apt install git vim curl htop dwdiff
+sudo apt install git vim curl htop dwdiff fonts-firacode
+
+if wants 'Vector Mono'; then
+    mkdir -p "$HOME/.fonts"
+
+    curl 'https://github.com/rubjo/victor-mono/raw/master/public/VictorMonoAll.zip' > /tmp/victor.zip
+
+    unzip -j -d "$HOME/.fonts" /tmp/victor.zip 'OTF/*'
+fi
 
 if wants 'VS Code'; then
     echo 'Go to https://code.visualstudio.com/Download and download the'
