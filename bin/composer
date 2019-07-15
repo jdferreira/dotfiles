@@ -1,0 +1,4 @@
+#/usr/bin/env bash
+
+docker run --rm -it -v "$PWD:/app" -v "$HOME/.composer:/tmp" -u $(id -u):$(id -g) composer "$@"
+

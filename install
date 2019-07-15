@@ -11,3 +11,6 @@ cp -l .vimrc     "$HOME"
 
 # Setup preferences
 . setup-preferences.sh
+
+# Copy binary (and other executable) files
+. copy-bin.sh

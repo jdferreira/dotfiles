@@ -1,0 +1,19 @@
+#/usr/bin/env bash
+
+REPOSITORY=$(
+    docker images -f reference=php --format '{{.Repository}}:{{.Tag}}' | head -n 1
+)
+
+if [ "$REPOSITORY" = "" ]; then
+    echo 'Cannot find a docker image for php' >&2
+    exit;
+fi
+
+docker run --rm -it \
+    -e "HOME=/home/www-data" \
+    -v "$PWD:/cwd" -w "/cwd" \
+    -v "$HOME/.config/psysh:/home/www-data/.config/psysh" \
+    -u $(id -u):$(id -g) \
+    $REPOSITORY \
+    php "$@"
+
