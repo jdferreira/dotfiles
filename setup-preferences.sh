@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/usr/bin/env bash
 
 wants() {
     echo -n "Do you want to install preferences for $1? [y/N] "
