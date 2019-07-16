@@ -150,6 +150,32 @@ if [ -d "$HOME/.config/composer/vendor/bin" ]; then
 fi
 
 
+###########################
+# Docker & Docker compose #
+###########################
+
+upsearch() {
+    if [ "$PWD" != '/' ]; then
+        if [ -e "$1" ]; then
+            echo "$PWD/$1"
+        else
+            ( cd .. && upsearch "$1" )
+        fi
+    fi
+}
+
+dc() {
+    local up
+    up=$(upsearch docker-compose.yml)
+    if [ "$up" = '' ]; then up=$(upsearch docker-compose.yaml); fi
+    if [ "$up" = '' ]; then echo 'Cannot find docker.compose.yml' >&2; exit; fi
+    
+    (
+        cd "$(dirname "$up")"
+        docker-compose exec "$@"
+    )
+}
+
 ########################
 # Personal executables #
 ########################
