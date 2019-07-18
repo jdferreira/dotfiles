@@ -168,7 +168,7 @@ dc() {
     local up
     up=$(upsearch docker-compose.yml)
     if [ "$up" = '' ]; then up=$(upsearch docker-compose.yaml); fi
-    if [ "$up" = '' ]; then echo 'Cannot find docker.compose.yml' >&2; exit; fi
+    if [ "$up" = '' ]; then echo 'Cannot find docker-compose.yml' >&2; return; fi
     
     (
         cd "$(dirname "$up")"
