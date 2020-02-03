@@ -88,6 +88,13 @@ shopt -s checkwinsize
 shopt -s globstar
 
 
+######################################
+# Edit systemd config files with vim #
+######################################
+
+export SYSTEMD_EDITOR="vim"
+
+
 ###########
 # Aliases #
 ###########
