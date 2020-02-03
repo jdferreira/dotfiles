@@ -27,7 +27,7 @@ fi
 
 if wants 'Docker'; then
     echo 'Described in https://docs.docker.com/install/linux/docker-ce/ubuntu/'
-    
+
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
     sudo add-apt-repository \
         "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
@@ -41,7 +41,7 @@ fi
 
 if wants 'pyenv'; then
     curl https://pyenv.run | bash
-    
+
     eval "$(pyenv init -)"
     eval "$(pyenv virtualenv-init -)"
     pyenv shell $(pyenv versions | tail -n1) 2> /dev/null

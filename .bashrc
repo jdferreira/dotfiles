@@ -20,9 +20,9 @@ get_short_wd() {
 
     if [ $(echo -n $cwd | awk -F '/' '{ print NF }') -gt $depth ]; then
         tail=$(seq $(($depth-2)) '-1' 0 | sed 's/.*/$(NF-\0)/' | paste -sd '/' - | sed 's_/_ "/" _g')
-        
+
         cwd=$(echo -n $cwd | awk -F '/' '{ print $1 "/" "'"$ellipsis"'" "/" '"$tail"' }')
-    fi 
+    fi
 
     echo $cwd
 }
@@ -169,7 +169,7 @@ dc() {
     up=$(upsearch docker-compose.yml)
     if [ "$up" = '' ]; then up=$(upsearch docker-compose.yaml); fi
     if [ "$up" = '' ]; then echo 'Cannot find docker-compose.yml' >&2; return; fi
-    
+
     (
         cd "$(dirname "$up")"
         docker-compose exec "$@"
