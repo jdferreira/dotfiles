@@ -124,6 +124,9 @@ alias pyg='pygmentize -O style=native'
 # Format JSON output
 alias ppjson='python -m json.tool --sort-keys | pyg -l json'
 
+# Start nautilus on the current working directory
+alias nautilus='(nautilus . >/dev/null 2>&1 & disown) #'
+
 
 ########
 # Less #
