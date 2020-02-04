@@ -7,3 +7,5 @@ set tabstop=4
 set shiftwidth=4
 set expandtab
 
+" Set spell check in git commit messages
+autocmd Filetype gitcommit setlocal spell
