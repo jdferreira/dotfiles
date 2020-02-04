@@ -7,7 +7,7 @@ wants() {
 }
 
 sudo apt update
-sudo apt install git vim curl htop dwdiff fonts-firacode
+sudo apt install git vim curl htop dwdiff fonts-firacode rclone colordiff tree
 
 if wants 'Vector Mono'; then
     mkdir -p "$HOME/.fonts"
@@ -54,3 +54,7 @@ fi
 if wants 'pygments'; then
     pip install pygments
 fi
+
+# List of installed packages that are "interesting"
+# `pass` (needs `haveged`) --> I do not understand how to share the gpg key yet...
+# `strongswan` (for VPN@ciencias)
