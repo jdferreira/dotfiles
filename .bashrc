@@ -94,7 +94,6 @@ shopt -s globstar
 
 export SYSTEMD_EDITOR="vim"
 
-
 ###########
 # Aliases #
 ###########
@@ -124,9 +123,15 @@ alias pyg='pygmentize -O style=native'
 # Format JSON output
 alias ppjson='python -m json.tool --sort-keys | pyg -l json'
 
-# Start nautilus on the current working directory
-alias nautilus='(nautilus . >/dev/null 2>&1 & disown) #'
+alias jn='jupyter notebook'
+alias jl='jupyter lab'
 
+# Start nautilus, ensuring that the executable starts if it has not yet been
+# started before
+nautilus() {
+    local dest="${1:-.}"
+    (command nautilus "$dest" >/dev/null 2>&1 & disown)
+}
 
 ########
 # Less #
@@ -151,6 +156,12 @@ if [ -d "$HOME/.pyenv/bin" ]; then
 fi
 
 
+########
+# NLTK #
+########
+
+export NLTK_DATA="$HOME/.nltk_data"
+
 ############
 # Composer #
 ############
@@ -158,6 +169,15 @@ fi
 if [ -d "$HOME/.config/composer/vendor/bin" ]; then
     PATH="$HOME/.config/composer/vendor/bin:$PATH"
 fi
+
+
+#######
+# nvm #
+#######
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 
 ###########################
@@ -186,8 +206,41 @@ dc() {
     )
 }
 
+
+############################
+# Docker specific commands #
+############################
+
+alias composer='docker run --rm -it -v "$(pwd):/app" -v "$HOME/.composer:/tmp" -u "$(id -u):$(id -g)" composer'
+
 ########################
 # Personal executables #
 ########################
 
 PATH="$HOME/.bin:$PATH"
+
+################
+# Google cloud #
+################
+
+if [ -d "$HOME/.google-cloud-sdk" ]; then
+    # Update PATH
+    source "$HOME/.google-cloud-sdk/path.bash.inc"
+
+    # Enable shell command completion
+    source "$HOME/.google-cloud-sdk/completion.bash.inc"
+fi
+
+################
+# Rust & Cargo #
+################
+
+if [ -d "$HOME/.cargo/bin" ]; then
+    export PATH="$HOME/.cargo/bin:$PATH"
+fi
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/home/jdferreira/Downloads/google-cloud-sdk-303.0.0-linux-x86_64/google-cloud-sdk/path.bash.inc' ]; then . '/home/jdferreira/Downloads/google-cloud-sdk-303.0.0-linux-x86_64/google-cloud-sdk/path.bash.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/home/jdferreira/Downloads/google-cloud-sdk-303.0.0-linux-x86_64/google-cloud-sdk/completion.bash.inc' ]; then . '/home/jdferreira/Downloads/google-cloud-sdk-303.0.0-linux-x86_64/google-cloud-sdk/completion.bash.inc'; fi
