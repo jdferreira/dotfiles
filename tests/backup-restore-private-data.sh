@@ -27,7 +27,7 @@ printf '%s\n' '#!/usr/bin/env bash' \
     'exec "$REAL_GPG" --batch --pinentry-mode loopback --passphrase-file "$TEST_PASSPHRASE_FILE" --s2k-count 65536 "$@"' > "$tmp/mock/gpg"
 chmod +x "$tmp/mock/gpg"
 export PATH="$tmp/mock:$PATH"
-script="$ROOT/scripts/backup-restore-private-data.sh"
+script="$ROOT/scripts/backup-private-data.sh"
 
 # All four targets round-trip, verify without changing HOME, preserve conflicts,
 # normalize modes, and refuse overwriting the encrypted backup.
@@ -67,6 +67,45 @@ for kind in ssh aws git-signing bash-history; do
     if [[ $kind == aws ]]; then [[ ! -e $HOME/.aws/sso ]]; fi
     if grep -Eq 'SYNTHETIC_PRIVATE_DATA|CACHE_MUST_NOT_MIGRATE' "$tmp/output"; then exit 1; fi
 done
+
+# Git config restores independent files without rewriting identities or following
+# includes. Missing standard files are optional; extra includes are explicit.
+mkdir -p "$HOME/.config/git" "$HOME/private"
+printf '[include]\n path = ~/private/work.inc\n' > "$HOME/.gitconfig"
+printf '[user]\n name = Synthetic Identity\n' > "$HOME/.gitconfig.local"
+printf '[core]\n editor = vim\n' > "$HOME/.config/git/config"
+printf '[alias]\n st = status\n' > "$HOME/private/work.inc"
+printf 'KEEP_UNRELATED\n' > "$HOME/.config/git/ignore"
+git_archive="$tmp/usb/git-config.tar.gpg"
+bash "$script" backup git-config "$git_archive" --git-file private/work.inc > "$tmp/output" 2>&1
+if bash "$script" verify git-config "$git_archive" >> "$tmp/output" 2>&1; then exit 1; fi
+bash "$script" verify git-config "$git_archive" --git-file private/work.inc >> "$tmp/output" 2>&1
+printf 'EXISTING_CONFIG\n' > "$HOME/.gitconfig.local"
+bash "$script" restore git-config "$git_archive" --git-file private/work.inc <<< n >> "$tmp/output" 2>&1
+grep -q EXISTING_CONFIG "$HOME/.gitconfig.local"
+# Parent symlinks must not redirect restored includes outside the intended tree.
+mv "$HOME/private" "$HOME/real-private"
+ln -s real-private "$HOME/private"
+if bash "$script" restore git-config "$git_archive" --git-file private/work.inc <<< y >> "$tmp/output" 2>&1; then exit 1; fi
+grep -q EXISTING_CONFIG "$HOME/.gitconfig.local"
+rm "$HOME/private"
+mv "$HOME/real-private" "$HOME/private"
+bash "$script" restore git-config "$git_archive" --git-file private/work.inc <<< y >> "$tmp/output" 2>&1
+grep -q 'Synthetic Identity' "$HOME/.gitconfig.local"
+grep -q KEEP_UNRELATED "$HOME/.config/git/ignore"
+for file in .gitconfig .gitconfig.local .config/git/config private/work.inc; do
+    [[ $(stat -c %a "$HOME/$file") == 600 ]]
+    compgen -G "$HOME/$file.backup.*" >/dev/null
+done
+if grep -q 'Synthetic Identity' "$tmp/output"; then exit 1; fi
+for invalid in ../outside /absolute .git-credentials .config/git/credentials private; do
+    if bash "$script" backup git-config "$tmp/usb/invalid-git.gpg" --git-file "$invalid" > "$tmp/output" 2>&1; then exit 1; fi
+done
+# A laptop with only the private local config can still back it up and restore it.
+rm "$HOME/.gitconfig" "$HOME/.config/git/config"
+bash "$script" backup git-config "$tmp/usb/git-local.tar.gpg" > "$tmp/output" 2>&1
+bash "$script" restore git-config "$tmp/usb/git-local.tar.gpg" <<< y >> "$tmp/output" 2>&1
+[[ ! -e $HOME/.gitconfig ]]
 
 # AWS helper files are opt-in, round-trip as private data, and are never executed.
 # The same selection is required to verify/restore; nested/cache paths are forbidden.

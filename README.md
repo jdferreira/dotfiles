@@ -11,7 +11,7 @@ installed by tests.
 - `scripts/new-laptop-*.sh`: install, restore or validate on the replacement laptop.
 - `scripts/export-restore-gnome.sh` and `scripts/export-restore-vscode.sh`:
   run `export` on the old laptop and `restore` on the new one.
-- `scripts/backup-restore-private-data.sh`: run `backup` on the old laptop,
+- `scripts/backup-private-data.sh`: run `backup` on the old laptop,
   `verify` on either laptop, and `restore` on the new one.
 - `scripts/lib.sh`: shared helpers, not a standalone command.
 
@@ -119,14 +119,43 @@ complete.
 - [x] Edit `preferences/vscode/extensions.txt` to keep only wanted extensions,
       including the extension providing your theme.
 
-### 6. Enable account-based settings synchronization
+### 6. Prepare Git configuration
+
+Git config can contain secrets and personal information. Migrate it privately;
+no shared `.gitconfig` is installed by `--dotfiles`.
+
+- [x] Open `~/.gitconfig` and review identities, aliases, signing options,
+      credential helpers and machine-specific paths locally.
+- [x] Review `[include]`/`[includeIf]` references and any custom
+      `GIT_CONFIG_GLOBAL` or `XDG_CONFIG_HOME` paths. The script does not
+      discover or follow them.
+- [x] Back up the standard files that exist:
+```bash
+scripts/backup-private-data.sh \
+      backup git-config \
+      "/media/$USER/MY_USB/git-config.tar.gpg"
+```
+  - For additional included config files, append `--git-file HOME_RELATIVE_PATH`
+    for each file. Replace that placeholder with an actual path under your home,
+    such as `.config/git/work.inc` only if you use that file. Symlinks,
+    directories and outside-home files require a separate backup procedure. Git
+    credential stores are not included; keep tokens in a secure credential
+    manager.
+- [x] Verify the archive, repeating any `--git-file` selections:
+```bash
+scripts/backup-private-data.sh verify git-config "/media/$USER/MY_USB/git-config.tar.gpg"
+```
+
+`git-signing` backs up GPG key material separately; use it as well if needed.
+
+### 7. Enable account-based settings synchronization
 
 - [x] Sign into IntelliJ's **Settings Sync / Backup and Sync** using your
       JetBrains account. Check that keymaps, settings and wanted plugins sync.
 - [x] Sign into Firefox Sync and review the categories you want synchronized.
 - [x] Sign into Chrome Sync and review the categories you want synchronized.
 
-### 7. Verify the backup and save reviewed repository changes
+### 8. Verify the backup and save reviewed repository changes
 
 - [x] Back up needed SSH keys and authentication material following the
       [authentication guidance below](#authentication-and-private-data).

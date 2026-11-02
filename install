@@ -28,12 +28,8 @@ for step in "${steps[@]}"; do
         dotfiles)
             for file in .bashrc .vimrc; do link_file "$ROOT/$file" "$HOME/$file"; done
 
-            # Preserve existing identities, includes, helpers and aliases. Git config is opt-in.
-            if [[ ! -e $HOME/.gitconfig && ! -L $HOME/.gitconfig ]]; then
-                if confirm 'Install the tracked Git config (contains the original personal identity)?'; then
-                    link_file "$ROOT/.gitconfig" "$HOME/.gitconfig"
-                fi
-            else echo 'Keeping existing ~/.gitconfig. Review tracked .gitconfig and merge manually.'; fi
+            # Git config is private; never link a missing/public identity template.
+            echo 'Git configuration unchanged. Restore it with scripts/backup-private-data.sh restore git-config ARCHIVE.'
             ;;
         apt) "$ROOT/scripts/new-laptop-install-apt-packages.sh" ;;
         docker) "$ROOT/scripts/new-laptop-install-docker.sh" ;;

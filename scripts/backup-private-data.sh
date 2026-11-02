@@ -6,8 +6,9 @@ umask 077
 source "$(dirname -- "$(readlink -f -- "$0")")/lib.sh"
 
 usage() {
-    echo 'Usage: backup-restore-private-data.sh backup|restore|verify TARGET /path/on/USB/backup.tar.gpg'
-    echo 'Targets: ssh, aws, git-signing (GPG), bash-history'
+    echo 'Usage: backup-private-data.sh backup|restore|verify TARGET /path/on/USB/backup.tar.gpg'
+    echo 'Targets: ssh, aws, git-config, git-signing (GPG), bash-history'
+    echo 'Git config: append --git-file HOME_RELATIVE_PATH for additional included config files.'
     echo 'AWS only: append --aws-file NAME for each extra regular file directly in ~/.aws.'
     echo 'Repeat the same selections for backup, verify and restore.'
     echo 'Use a separate archive for each target. GnuPG prompts for the passphrase.'
@@ -31,6 +32,7 @@ case $mode in backup|restore|verify) ;; *) usage; exit 2 ;; esac
 case $kind in
     ssh) target=.ssh; candidates=(.ssh) ;;
     aws) target=.aws; candidates=(.aws/config .aws/credentials) ;;
+    git-config) target=.gitconfig; candidates=(.gitconfig .gitconfig.local .config/git/config) ;;
     git-signing)
         target=.gnupg
         candidates=(.gnupg/private-keys-v1.d .gnupg/openpgp-revocs.d
@@ -45,18 +47,44 @@ esac
 # Extra AWS files are explicit top-level filenames, never paths/directories.
 # Do not parse or execute credential_process commands to discover dependencies.
 aws_extras=()
+git_extras=()
 while (($#)); do
-    [[ $kind == aws && $1 == --aws-file && $# -ge 2 ]] || { usage; exit 2; }
+    [[ $# -ge 2 ]] || { usage; exit 2; }
     name=$2
-    [[ $name =~ ^[a-zA-Z0-9][a-zA-Z0-9._-]*$ ]] || fail 'AWS extra must be a filename directly inside the AWS directory.'
-    [[ $name != config && $name != credentials ]] || fail 'AWS config and credentials are already included.'
-    for existing in "${aws_extras[@]}"; do
-        [[ $existing != ".aws/$name" ]] || fail 'Duplicate AWS extra selection.'
+    case "$kind:$1" in
+        aws:--aws-file)
+            [[ $name =~ ^[a-zA-Z0-9][a-zA-Z0-9._-]*$ ]] || fail 'AWS extra must be a filename directly inside the AWS directory.'
+            candidate=".aws/$name"
+            aws_extras+=("$candidate")
+            ;;
+        git-config:--git-file)
+            # Home-relative, explicit config files only: do not follow includes,
+            # read credential stores, or execute helpers to discover dependencies.
+            [[ $name =~ ^[a-zA-Z0-9._-][a-zA-Z0-9._/@+\ -]*$ && $name != */ ]] || fail 'Git extra must be a home-relative file path.'
+            case /$name/ in */../*|*/./*|*//*) fail 'Git extra contains an unsafe path.' ;; esac
+            case $name in .git-credentials|.config/git/credentials) fail 'Git credential stores are not supported; reauthenticate using a secure helper.' ;; esac
+            candidate=$name
+            git_extras+=("$candidate")
+            ;;
+        *) usage; exit 2 ;;
+    esac
+    for existing in "${candidates[@]}"; do
+        [[ $existing != "$candidate" ]] || fail 'Duplicate file selection (standard files are already included).'
     done
-    aws_extras+=(".aws/$name")
-    candidates+=(".aws/$name")
+    candidates+=("$candidate")
     shift 2
 done
+
+# Git config may live under multiple directories. Refuse symlinked ancestors
+# instead of reading/writing private files outside the explicitly selected paths.
+check_git_parents() {
+    local parent
+    parent=$(dirname -- "$HOME/$1")
+    while [[ $parent != "$HOME" && $parent != / ]]; do
+        [[ ! -L $parent && ( ! -e $parent || -d $parent ) ]] || fail 'Git config parent must be a real directory, not a link or file.'
+        parent=$(dirname -- "$parent")
+    done
+}
 
 for command in gpg tar realpath find stat; do
     command -v "$command" >/dev/null || fail "Required command missing: $command"
@@ -67,10 +95,12 @@ archive=$(realpath -m -- "$archive_input")
 case $archive in
     "$ROOT"|"$ROOT"/*) fail 'Choose an archive outside the dotfiles checkout, ideally on a mounted USB drive.' ;;
 esac
-source_path=$(realpath -m -- "$HOME/$target")
-case $archive in
-    "$source_path"|"$source_path"/*) fail 'The archive must be outside the data being backed up.' ;;
-esac
+for candidate in "${candidates[@]}"; do
+    source_path=$(realpath -m -- "$HOME/$candidate")
+    case $archive in
+        "$source_path"|"$source_path"/*) fail 'The archive must be outside the data being backed up.' ;;
+    esac
+done
 
 work=''
 encrypted=''
@@ -95,16 +125,17 @@ if [[ $mode == backup ]]; then
         fail 'Keyboxd detected. Use GnuPG export/import with a separate encrypted backup instead.'
     fi
 
-    for extra in "${aws_extras[@]}"; do
-        [[ -f $HOME/$extra ]] || fail 'A selected AWS extra is missing or is not a regular file.'
+    for extra in "${aws_extras[@]}" "${git_extras[@]}"; do
+        [[ -f $HOME/$extra ]] || fail 'A selected extra is missing or is not a regular file.'
     done
 
     sources=()
     for candidate in "${candidates[@]}"; do
         path="$HOME/$candidate"
         [[ -e $path || -L $path ]] || continue
-        if [[ $kind == aws && ! -f $path ]]; then
-            fail 'AWS selections must be regular files, never directories or caches.'
+        if [[ $kind == git-config ]]; then check_git_parents "$candidate"; fi
+        if [[ ( $kind == aws || $kind == git-config ) && ! -f $path ]]; then
+            fail 'AWS and Git config selections must be regular files, never directories.'
         fi
 
         # Reject links and special files, rather than following external targets or
@@ -117,7 +148,7 @@ if [[ $mode == backup ]]; then
 
     if [[ $kind == bash-history ]]; then
         [[ -f $HOME/$target ]] || fail 'Bash history must be a regular file.'
-    else
+    elif [[ $kind != git-config ]]; then
         [[ -d $HOME/$target ]] || fail 'The source must be a directory.'
     fi
 
@@ -153,10 +184,18 @@ fi
 tar --list --quoting-style=literal --file="$work/archive.tar" > "$work/paths"
 [[ -s $work/paths ]] || fail 'Archive is empty.'
 while IFS= read -r entry; do
-    case $entry in
-        "$target"|"$target/"|"$target/"*) ;;
-        *) fail 'Archive contains a path outside the selected target.' ;;
-    esac
+    if [[ $kind == git-config ]]; then
+        allowed=false
+        for candidate in "${candidates[@]}"; do
+            [[ $entry != "$candidate" ]] || allowed=true
+        done
+        "$allowed" || fail 'Git archive contains unselected files; repeat the original --git-file selections.'
+    else
+        case $entry in
+            "$target"|"$target/"|"$target/"*) ;;
+            *) fail 'Archive contains a path outside the selected target.' ;;
+        esac
+    fi
     case /$entry/ in */../*|*/./*) fail 'Archive contains an unsafe path.' ;; esac
 
     # Even a manually created AWS archive must not transfer SSO caches.
@@ -173,6 +212,43 @@ done < "$work/paths"
 mkdir "$work/extracted"
 tar --extract --file="$work/archive.tar" --directory="$work/extracted" \
     --no-same-owner --no-same-permissions --keep-old-files
+# Git config is a set of independent files, not a directory to replace wholesale.
+# Restore only archived files, preserving other ~/.config/git files and missing
+# optional configurations. Never merge or rewrite identities, aliases or includes.
+if [[ $kind == git-config ]]; then
+    git_files=()
+    for candidate in "${candidates[@]}"; do
+        path="$work/extracted/$candidate"
+        [[ -e $path ]] || continue
+        [[ -f $path ]] || fail 'Git config archive must contain only regular files.'
+        chmod 600 "$path"
+        git_files+=("$candidate")
+    done
+    for extra in "${git_extras[@]}"; do
+        [[ -f $work/extracted/$extra ]] || fail 'Git archive is missing a selected extra file.'
+    done
+    ((${#git_files[@]})) || fail 'Git config archive has no configuration files.'
+
+    if [[ $mode == verify ]]; then
+        echo 'Verified: Git config archive decrypts and contains restorable files. No home files changed.'
+        exit 0
+    fi
+
+    # Preflight every parent before changing any file; do not follow existing
+    # destination symlinks. Existing file symlinks themselves are backed up.
+    for candidate in "${git_files[@]}"; do check_git_parents "$candidate"; done
+    if ! confirm 'Restore archived Git config files verbatim, backing up existing files first?'; then exit 0; fi
+    stage=$(mktemp -d "$HOME/.private-restore.XXXXXXXX")
+    cp -a -- "$work/extracted/." "$stage/"
+    for candidate in "${git_files[@]}"; do
+        mkdir -p -- "$(dirname -- "$HOME/$candidate")"
+        backup "$HOME/$candidate"
+        mv -- "$stage/$candidate" "$HOME/$candidate"
+    done
+    echo 'Git configuration restored as private files (600). Review includes, identity and machine-specific paths locally.'
+    exit 0
+fi
+
 if [[ $kind == bash-history ]]; then
     [[ -f $work/extracted/$target ]] || fail 'Archive has no history file.'
 else

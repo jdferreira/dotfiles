@@ -47,7 +47,8 @@ for file in .bashrc .inputrc .vimrc; do
     if [[ -L $HOME/$file && $(readlink -- "$HOME/$file") == "$ROOT/$file" && -e $HOME/$file ]]; then echo "OK: $file link";
     else echo "REVIEW: $file; run ./install --dotfiles"; missing=$((missing+1)); fi
 done
-check test -f "$HOME/.gitconfig"
+# Let Git discover its global config, including XDG/custom paths; hide all values.
+check git -C "$HOME" config --global --list
 
 # Only require VS Code files that were actually exported into this repository.
 for file in settings.json keybindings.json; do
