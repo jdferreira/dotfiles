@@ -296,11 +296,11 @@ Never commit secrets to this repository. This includes, for example:
 Even Git config, AWS config, GNOME commands and editor settings can
 contain PII or secrets. 
 
-The repository is set to respect ignore rules, and redacted Gitleaks CI act as
-guardrails. But none of these are **proofs of safety**. At every stage,
-carefully review files staged locally. Consider that old commits retain original
-files and that deleting a file does not erase history. If a secret was ever
-committed, revoke/rotate it and coordinate history cleanup.
+Ignore rules are guardrails, **not proof of safety**. No automated
+secret-scanning workflow is configured. At every stage, carefully review files
+staged locally. Consider that old commits retain original files and that
+deleting a file does not erase history. If a secret was ever committed,
+revoke/rotate it and coordinate history cleanup.
 
 Use `scripts/backup-restore-private-data.sh` to create, verify and restore
 **separate encrypted backups** outside this repository, ideally on a USB drive.
