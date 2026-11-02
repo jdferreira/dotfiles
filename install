@@ -1,16 +1,44 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-# Copy (as hard links) the dot files to the home directory
-cp -l .bashrc    "$HOME"
-cp -l .gitconfig "$HOME"
-cp -l .inputrc   "$HOME"
-cp -l .vimrc     "$HOME"
+source "$(dirname -- "$(readlink -f -- "$0")")/scripts/lib.sh"
 
-# Install the apt packages
-. install-apt-packages.sh
+usage() {
+    echo 'Usage: ./install --dotfiles --preferences'
+    echo '  --apt --brew --docker --apps --firefox --keyboard --remove-snap-flatpak --check-repos'
+    echo 'System operations always ask for confirmation'
+}
 
-# Setup preferences
-. setup-preferences.sh
+steps=()
 
-# Copy binary (and other executable) files
-. copy-bin.sh
+while (($#)); do
+    case $1 in
+        --help|-h) usage; exit 0 ;;
+        --dotfiles|--preferences|--apt|--brew|--docker|--apps|--firefox|--keyboard|--remove-snap-flatpak|--check-repos) steps+=("${1#--}") ;;
+        *) usage; exit 2 ;;
+    esac
+    shift
+done
+
+((${#steps[@]})) || { usage; exit 2; }
+trap 'echo "Installation failed at line $LINENO. Resolve the error and rerun the selected step." >&2' ERR
+
+for step in "${steps[@]}"; do
+    case $step in
+        dotfiles)
+            for file in .bashrc .vimrc; do link_file "$ROOT/$file" "$HOME/$file"; done
+
+            # Preserve existing identities, includes, helpers and aliases. Git config is opt-in.
+            if [[ ! -e $HOME/.gitconfig && ! -L $HOME/.gitconfig ]]; then
+                if confirm 'Install the tracked Git config (contains the original personal identity)?'; then
+                    link_file "$ROOT/.gitconfig" "$HOME/.gitconfig"
+                fi
+            else echo 'Keeping existing ~/.gitconfig. Review tracked .gitconfig and merge manually.'; fi
+            ;;
+        apt) "$ROOT/scripts/new-laptop-install-apt-packages.sh" ;;
+        docker) "$ROOT/scripts/new-laptop-install-docker.sh" ;;
+        brew|apps|firefox|keyboard|remove-snap-flatpak) "$ROOT/scripts/new-laptop-install-software.sh" "$step" ;;
+        preferences) "$ROOT/scripts/new-laptop-restore-preferences.sh" ;;
+        check-repos) "$ROOT/scripts/old-laptop-check-repos.sh" ;;
+    esac
+done

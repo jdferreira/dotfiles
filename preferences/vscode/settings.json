@@ -1,0 +1,270 @@
+{
+  // Workbench appearance and layout
+  "workbench.startupEditor": "none",
+  "workbench.iconTheme": "material-icon-theme",
+  "workbench.colorTheme": "Dark Modern",
+  "workbench.colorCustomizations": {
+    "editorIndentGuide.background1": "#00000001",
+    "quickInput.background": "#333333",
+    "editorHoverWidget.border": "#888888",
+    "editorHoverWidget.background": "#333333F4"
+  },
+  "workbench.editor.empty.hint": "hidden",
+  "workbench.editor.enablePreview": false,
+  "workbench.tree.indent": 16,
+  "workbench.tree.renderIndentGuides": "always",
+  "workbench.secondarySideBar.defaultVisibility": "hidden",
+  "extensions.ignoreRecommendations": true,
+
+  // Editor appearance, suggestions and inlay hints
+  "editor.fontFamily": "Fira Code, Ubuntu Mono, Victor Mono, Droid Sans Mono, monospace",
+  "editor.fontLigatures": true,
+  "editor.fontWeight": "400",
+  "editor.fontSize": 14,
+  "editor.lineHeight": 1.5,
+  "editor.insertSpaces": true,
+  "editor.renderWhitespace": "trailing",
+  "editor.renderControlCharacters": false,
+  "editor.semanticHighlighting.enabled": false,
+  "editor.bracketPairColorization.enabled": false,
+  "editor.linkedEditing": false,
+  "editor.suggestSelection": "first",
+  "editor.stickyScroll.enabled": true,
+  "editor.minimap.showSlider": "always",
+  "editor.minimap.size": "fill",
+  "editor.inlayHints.enabled": "onUnlessPressed",
+  "editor.inlayHints.fontFamily": "Ubuntu",
+  "editor.inlayHints.maximumLength": 0,
+  "editor.inlayHints.padding": true,
+  "rewrap.wholeComment": false,
+  "rewrap.wrappingColumn": 80,
+  "prettier.printWidth": 120,
+
+  // File explorer
+  "explorer.openEditors.visible": 1,
+  "explorer.incrementalNaming": "smart",
+  "explorer.autoReveal": false,
+  "explorer.confirmDragAndDrop": false,
+
+  // File handling, associations and exclusions
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
+  "files.exclude": {
+    "**/.mypy_cache": true,
+    "**/.pytest_cache": true,
+    "**/.ruff_cache": true,
+    "**/__pycache__": true,
+    "**/.venv": true,
+    "**/build": true,
+    "**/dist": true,
+    "**/*.egg-info": true
+  },
+  "files.watcherExclude": {
+    "**/.mypy_cache": true,
+    "**/.pytest_cache": true,
+    "**/.ruff_cache": true,
+    "**/__pycache__": true,
+    "**/.venv": true,
+    "**/build": true,
+    "**/dist": true,
+    "**/*.egg-info": true
+  },
+
+  // Search
+  "search.useParentIgnoreFiles": true,
+  "search.useIgnoreFiles": true,
+  "search.exclude": {
+    "**/.mypy_cache": true,
+    "**/.pytest_cache": true,
+    "**/.ruff_cache": true,
+    "**/__pycache__": true,
+    "**/.venv": true,
+    "**/build": true,
+    "**/dist": true,
+    "**/*.egg-info": true
+  },
+
+  // Diff behaviour
+  "diffEditor.renderSideBySide": true,
+  "diffEditor.ignoreTrimWhitespace": false,
+
+  // Integrated terminal
+  "terminal.integrated.allowChords": false,
+  "terminal.integrated.cursorBlinking": true,
+  "terminal.integrated.showExitAlert": false,
+  "terminal.integrated.fontLigatures.enabled": true,
+  "terminal.integrated.stickyScroll.enabled": false,
+  "terminal.integrated.shellIntegration.enabled": false,
+  "terminal.integrated.suggest.enabled": false,
+
+  // Git and GitHub integration
+  "git.autofetch": false,
+  "git.openRepositoryInParentFolders": "never",
+  "git.blame.editorDecoration.enabled": false,
+  "git.blame.statusBarItem.enabled": false,
+  "githubPullRequests.terminalLinksHandler": "github",
+  "githubPullRequests.pullBranch": "prompt",
+
+  // Python: Pylance, Ruff and ty
+  "[python]": {
+    "editor.rulers": [80, 120],
+    "editor.formatOnType": true,
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.codeActionsOnSave": {
+      "source.organizeImports.ruff": "explicit",
+      "source.fixAll.ruff": "explicit"
+    },
+    "diffEditor.ignoreTrimWhitespace": false
+  },
+  "python.languageServer": "Pylance",
+  "python.analysis.typeCheckingMode": "standard",
+  "python.analysis.useLibraryCodeForTypes": true,
+  "python.analysis.completeFunctionParens": true,
+  "python.analysis.autoImportCompletions": true,
+  "python.analysis.autoFormatStrings": true,
+  "python.analysis.inlayHints.functionReturnTypes": true,
+  "python.analysis.inlayHints.pytestParameters": true,
+  "python.analysis.inlayHints.variableTypes": true,
+  "ruff.lineLength": 120,
+  "ty.disableLanguageServices": true,
+  "ty.diagnosticMode": "off",
+
+  // Rust and rust-analyzer
+  "[rust]": {
+    "editor.rulers": [80, 120],
+    "editor.formatOnSave": true
+  },
+  "rust-analyzer.testExplorer": true,
+  "rust-analyzer.lens.implementations.enable": false,
+  "rust-analyzer.lens.enable": false,
+  "rust-analyzer.lens.debug.enable": false,
+  "rust-analyzer.lens.run.enable": false,
+  "rust-analyzer.lens.updateTest.enable": false,
+  "rust-analyzer.showDependenciesExplorer": false,
+  "rust-analyzer.diagnostics.styleLints.enable": true,
+  "rust-analyzer.inlayHints.closingBraceHints.enable": false,
+  "rust-analyzer.inlayHints.closureStyle": "rust_analyzer",
+
+  // Formatting, Markdown and skill documents
+  "[markdown]": {
+    "editor.wordWrap": "wordWrapColumn",
+    "editor.wordWrapColumn": 80,
+    "editor.wrappingIndent": "indent",
+    "editor.tabSize": 2,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.rulers": [80, 100],
+    "files.trimTrailingWhitespace": false,
+    "diffEditor.ignoreTrimWhitespace": false
+  },
+  "markdown.preview.fontSize": 18,
+  "markdown.preview.lineHeight": 1.4,
+  "markdown.preview.doubleClickToSwitchToEditor": true,
+  "markdown.preview.typographer": true,
+
+  // Skills
+  "[skill]": {
+    "editor.autoIndent": "advanced",
+    "editor.unicodeHighlight.ambiguousCharacters": true,
+    "editor.unicodeHighlight.invisibleCharacters": true,
+    "editor.wordBasedSuggestions": "off",
+    "editor.wordWrap": "wordWrapColumn",
+    "editor.wordWrapColumn": 80,
+    "editor.wrappingIndent": "indent",
+    "editor.tabSize": 2,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.rulers": [80, 100],
+    "diffEditor.ignoreTrimWhitespace": true,
+    "files.trimTrailingWhitespace": false
+  },
+
+  // YAML, workflows and JSON
+  "[yaml]": {
+    "editor.autoIndent": "full",
+    "editor.defaultFormatter": "redhat.vscode-yaml",
+    "editor.tabSize": 2,
+    "editor.rulers": [80]
+  },
+  "[github-actions-workflow]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml",
+    "editor.tabSize": 2
+  },
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features",
+    "editor.tabSize": 2
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2
+  },
+
+  // Templates and other file types
+  "emmet.triggerExpansionOnTab": true,
+  "emmet.showSuggestionsAsSnippets": false,
+  "emmet.showExpandedAbbreviation": "inMarkupAndStylesheetFilesOnly",
+  "[html]": {
+    "editor.defaultFormatter": "vscode.html-language-features",
+    "editor.tabSize": 2
+  },
+  "[jinja-html]": {
+    "editor.defaultFormatter": "vscode.html-language-features"
+  },
+  "protobuf.protoc.path": "protoc",
+  "npm.autoDetect": "off",
+
+  // Spell checking
+  "cSpell.languageSettings": [
+    {
+      "languageId": "python",
+      "includeRegExpList": ["/#.*/", "/\"\"\".*?\"\"\"/", "strings"]
+    }
+  ],
+  "cSpell.userWords": [
+    "dataframe",
+    "fairtiq",
+    "healthcheck",
+    "Interprocedural",
+    "parseable",
+    "promocodes",
+    "recurringly",
+    "timezone",
+    "transn",
+    "Welle",
+    "XAMAX"
+  ],
+  "cSpell.showInRuler": false,
+  "cSpell.useCustomDecorations": true,
+
+  // TODO annotations
+  "todo-tree.general.tags": ["BUG", "HACK", "FIXME", "TODO", "XXX", "[ ]", "[x]"],
+  "todo-tree.regex.regex": "(//|#|<!--|;|/\\*|^|^\\s*(-|\\d+.))\\s*($TAGS)",
+  "todo-tree.ripgrep.ripgrep": "rg",
+  "todo-tree.highlights.defaultHighlight": {
+    "background": "#00BB00",
+    "opacity": 0,
+    "fontWeight": "bold",
+    "textDecoration": "underline",
+    "rulerColour": "#00BB00",
+    "icon": "list-unordered"
+  },
+  "todo-tree.highlights.highlightDelay": 0,
+  "todo-tree.highlights.customHighlight": {
+    "TODO": {
+      "icon": "checklist"
+    },
+    "FIXME": {
+      "background": "#BB0000",
+      "icon": "flame"
+    },
+    "BUG": {
+      "background": "#FFCC33",
+      "icon": "bug"
+    }
+  },
+
+  // Insert numbers
+  "insertnum.start": 1,
+
+  // Chat UI
+  "chat.agent.enabled": false,
+}

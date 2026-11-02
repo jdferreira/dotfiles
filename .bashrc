@@ -1,3 +1,6 @@
+# shellcheck shell=bash
+# shellcheck disable=SC1091 # Optional machine-local integrations.
+
 ########################
 # Initial quick checks #
 ########################
@@ -14,22 +17,13 @@ esac
 #####################
 
 get_short_wd() {
-    local depth=3
-    local ellipsis="…"
-    local cwd="${PWD/#$HOME/\~}"
-
-    if [ $(echo -n $cwd | awk -F '/' '{ print NF }') -gt $depth ]; then
-        tail=$(seq $(($depth-2)) '-1' 0 | sed 's/.*/$(NF-\0)/' | paste -sd '/' - | sed 's_/_ "/" _g')
-
-        cwd=$(echo -n $cwd | awk -F '/' '{ print $1 "/" "'"$ellipsis"'" "/" '"$tail"' }')
-    fi
-
-    echo $cwd
+    printf '%s\n' "${PWD/#$HOME/\~}" | awk -F / 'NF > 3 { print $1 "/…/" $(NF-1) "/" $NF; next } { print }'
 }
 
 parse_git_branch() {
-    local yellow="$(tput setaf 3)$(tput bold)"
-    local reset="$(tput sgr0)"
+    local yellow reset
+    yellow="$(tput setaf 3)$(tput bold)"
+    reset="$(tput sgr0)"
 
     git symbolic-ref HEAD --short 2> /dev/null | sed -e 's/.*/('"$yellow"'\0'"$reset"')/'
 }
@@ -101,37 +95,16 @@ export SYSTEMD_EDITOR="vim"
 # Enable color support for various default commands
 alias ls='ls --color=always'
 alias grep='grep --color=always'
-
-# Other aliases
 alias ll='ls -l'
 
 # To show word-wide differences. This needs dwdiff
-if which dwdiff > /dev/null; then
+if command -v dwdiff > /dev/null; then
     alias wdiffless="dwdiff -P -w $'\033[1;37;41m' -x $'\033[0m' -y $'\033[1;37;42m' -z $'\033[0m'"
 fi
 
 # Add an 'alert' alias for long running commands.  Use like so:
 #   sleep 10; alert
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
-
-# Echo the apt logs
-alias apt-log='zcat -qf /var/log/apt/history.log*'
-
-# Use pygmentize to color code on the terminal
-alias pyg='pygmentize -O style=native'
-
-# Format JSON output
-alias ppjson='python -m json.tool --sort-keys | pyg -l json'
-
-alias jn='jupyter notebook'
-alias jl='jupyter lab'
-
-# Start nautilus, ensuring that the executable starts if it has not yet been
-# started before
-nautilus() {
-    local dest="${1:-.}"
-    (command nautilus "$dest" >/dev/null 2>&1 & disown)
-}
 
 ########
 # Less #
@@ -143,34 +116,6 @@ nautilus() {
 # Do not chop long lines, and interpret color codes
 export LESS='-SR'
 
-
-#########
-# Pyenv #
-#########
-
-if [ -d "$HOME/.pyenv/bin" ]; then
-    export PATH="$HOME/.pyenv/bin:$PATH"
-    eval "$(pyenv init -)"
-    eval "$(pyenv virtualenv-init -)"
-    pyenv shell $(pyenv versions | tail -n1) 2>/dev/null
-fi
-
-
-########
-# NLTK #
-########
-
-export NLTK_DATA="$HOME/.nltk_data"
-
-############
-# Composer #
-############
-
-if [ -d "$HOME/.config/composer/vendor/bin" ]; then
-    PATH="$HOME/.config/composer/vendor/bin:$PATH"
-fi
-
-
 #######
 # nvm #
 #######
@@ -178,58 +123,6 @@ fi
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
-
-###########################
-# Docker & Docker compose #
-###########################
-
-upsearch() {
-    if [ "$PWD" != '/' ]; then
-        if [ -e "$1" ]; then
-            echo "$PWD/$1"
-        else
-            ( cd .. && upsearch "$1" )
-        fi
-    fi
-}
-
-dc() {
-    local up
-    up=$(upsearch docker-compose.yml)
-    if [ "$up" = '' ]; then up=$(upsearch docker-compose.yaml); fi
-    if [ "$up" = '' ]; then echo 'Cannot find docker-compose.yml' >&2; return; fi
-
-    (
-        cd "$(dirname "$up")"
-        docker-compose exec "$@"
-    )
-}
-
-
-############################
-# Docker specific commands #
-############################
-
-alias composer='docker run --rm -it -v "$(pwd):/app" -v "$HOME/.composer:/tmp" -u "$(id -u):$(id -g)" composer'
-
-########################
-# Personal executables #
-########################
-
-PATH="$HOME/.bin:$PATH"
-
-################
-# Google cloud #
-################
-
-if [ -d "$HOME/.google-cloud-sdk" ]; then
-    # Update PATH
-    source "$HOME/.google-cloud-sdk/path.bash.inc"
-
-    # Enable shell command completion
-    source "$HOME/.google-cloud-sdk/completion.bash.inc"
-fi
 
 ################
 # Rust & Cargo #
@@ -239,8 +132,10 @@ if [ -d "$HOME/.cargo/bin" ]; then
     export PATH="$HOME/.cargo/bin:$PATH"
 fi
 
-# The next line updates PATH for the Google Cloud SDK.
-if [ -f '/home/jdferreira/Downloads/google-cloud-sdk-303.0.0-linux-x86_64/google-cloud-sdk/path.bash.inc' ]; then . '/home/jdferreira/Downloads/google-cloud-sdk-303.0.0-linux-x86_64/google-cloud-sdk/path.bash.inc'; fi
+############
+# Homebrew #
+############
 
-# The next line enables shell command completion for gcloud.
-if [ -f '/home/jdferreira/Downloads/google-cloud-sdk-303.0.0-linux-x86_64/google-cloud-sdk/completion.bash.inc' ]; then . '/home/jdferreira/Downloads/google-cloud-sdk-303.0.0-linux-x86_64/google-cloud-sdk/completion.bash.inc'; fi
+if [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+fi

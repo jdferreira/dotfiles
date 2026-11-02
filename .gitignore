@@ -1,0 +1,26 @@
+# Never stage authentication, history or local exports.
+.ssh/
+.aws/
+.gnupg/
+.git-credentials
+.bash_history
+.bashrc.local
+.gitconfig.local
+.netrc
+.env
+.env.*
+*.pem
+*.key
+id_rsa*
+id_ed25519*
+*credentials*
+*token*
+*cookie*
+*history*
+private/
+backups/
+*.backup.*
+*.before
+*.zip
+*.tar*
+# Rules cannot detect secrets embedded in otherwise legitimate config files.

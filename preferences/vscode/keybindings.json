@@ -1,0 +1,88 @@
+// Place your key bindings in this file to override the defaults
+[
+    {
+        "key": "ctrl+[Semicolon]",
+        "command": "workbench.action.terminal.toggleTerminal"
+    },
+    {
+        "key": "shift+alt+down",
+        "command": "editor.action.copyLinesDownAction",
+        "when": "editorTextFocus && !editorReadonly"
+    },
+    {
+        "key": "shift+alt+up",
+        "command": "editor.action.copyLinesUpAction",
+        "when": "editorTextFocus && !editorReadonly"
+    },
+    {
+        "key": "ctrl+k ctrl+a",
+        "command": "workbench.action.toggleActivityBarVisibility"
+    },
+    {
+        "key": "alt+left",
+        "command": "workbench.action.navigateBack"
+    },
+    {
+        "key": "alt+right",
+        "command": "workbench.action.navigateForward"
+    },
+    {
+        "key": "ctrl+m ctrl+up",
+        "command": "gotoNextPreviousMember.previousMember"
+    },
+    {
+        "key": "ctrl+m ctrl+down",
+        "command": "gotoNextPreviousMember.nextMember"
+    },
+    {
+        "key": "shift+alt+r",
+        "command": "workbench.files.action.showActiveFileInExplorer"
+    },
+    {
+        "key": "ctrl+pagedown",
+        "command": "workbench.action.terminal.focusNext",
+        "when": "terminalFocus"
+    },
+    {
+        "key": "ctrl+pageup",
+        "command": "workbench.action.terminal.focusPrevious",
+        "when": "terminalFocus"
+    },
+    {
+        "key": "ctrl+shift+alt+c",
+        "command": "copyRelativeFilePath"
+    },
+    {
+        "key": "ctrl+k ctrl+r",
+        "command": "git.unstageSelectedRanges"
+    },
+    {
+        "key": "ctrl+[Quote]",
+        "command": "editor.action.commentLine"
+    },
+    {
+        "key": "ctrl+k ctrl+r",
+        "command": "-workbench.action.keybindingsReference"
+    },
+    {
+        "key": "ctrl+alt+i ctrl+alt+i",
+        "command": "editor.unfold"
+    },
+    {
+        "key": "ctrl+alt+u",
+        "command": "editor.fold"
+    },
+    {
+        "key": "ctrl+alt+i ctrl+alt+o",
+        "command": "editor.unfoldRecursively"
+    },
+    {
+        "key": "alt+meta+c",
+        "command": "issue.copyGithubPermalink"
+    },
+    {
+        "key": "ctrl+alt+[BracketRight]",
+        "command": "workbench.action.terminal.newInNewWindow",
+        "when": "terminalHasBeenCreated || terminalProcessSupported"
+    }
+]
